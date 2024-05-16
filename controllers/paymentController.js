@@ -1,10 +1,11 @@
+import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import { User } from "../models/User.js"
 import errorHandler from "../utils/errorHandler.js";
 import Stripe from "stripe";
 
 const stripe = new Stripe("sk_test_51LvmGOSFm2R1ZC3VHz3HRr6RcHUt7JZ5KVF2S8UfJVnAePSemwfFRmTzl9Z71fR53fTWingNwVIesgUsBUZpbUDa00QCK1O7IE");
 
-export const buySubscription = async(req,res,next) => {
+export const buySubscription = catchAsyncError(async(req,res,next) => {
     const user = await User.findById(req.user._id);
     
     if(user.role==="admin")
@@ -37,4 +38,4 @@ console.log(subscription);
         subscriptionId: subscription.id,
     });
 
-}
+})

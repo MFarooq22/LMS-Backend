@@ -1,27 +1,29 @@
+import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import { Stats } from "../models/Stats.js";
-import {sendEmail} from "../utils/sendEmail.js"
-
-export const contact = async(req, res, next) => {
-    const {name,email,message} = req.body;
-
-    if (!name || !email || !message)
-        return next(new errorHandler("All fields are mandatory", 400));
-
-    const to=process.env.MY_MAIL;
-    const subject= "Contact from LMS"
-    const text=`I am ${name} and my email is ${email}. \n${message}`
-
-    await sendEmail(to,subject,text);
-  
-    res.status(200).json({
-      success: true,
-      message: "Your request has been sent."
-    });
-};
-  
+import { sendEmail } from "../utils/sendEmail.js"
 
 
-export const courseRequest = async(req, res, next) => {
+export const contact = catchAsyncError(async (req, res, next) => {
+  const { name, email, message } = req.body;
+
+  if (!name || !email || !message)
+    return next(new errorHandler("All fields are mandatory", 400));
+
+  const to = process.env.MY_MAIL;
+  const subject = "Contact from LMS"
+  const text = `I am ${name} and my email is ${email}. \n${message}`
+
+  await sendEmail(to, subject, text);
+
+  res.status(200).json({
+    success: true,
+    message: "Your request has been sent."
+  });
+});
+
+
+
+export const courseRequest = catchAsyncError(async (req, res, next) => {
   const { name, email, course } = req.body;
   if (!name || !email || !course)
     return next(new ErrorHandler("All fields are mandatory", 400));
@@ -36,11 +38,11 @@ export const courseRequest = async(req, res, next) => {
     success: true,
     message: "Your Request Has Been Sent.",
   });
-};
-  
+});
 
 
-export const getDashboardStats = async (req, res, next) => {
+
+export const getDashboardStats = catchAsyncError(async (req, res, next) => {
   const stats = await Stats.find({}).sort({ createdAt: "desc" }).limit(12);
 
   const statsData = [];
@@ -102,4 +104,4 @@ export const getDashboardStats = async (req, res, next) => {
     viewsProfit,
     usersProfit,
   });
-};
+});
